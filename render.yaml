@@ -1,0 +1,80 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Deploy: connect repo → New Blueprint → select render.yaml
+# Create a Render Postgres + Redis manually and paste URLs into env groups below.
+
+services:
+  - type: web
+    name: slideflow-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: REDIS_URL
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: NEXT_API_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: INTERNAL_SERVICE_TOKEN
+        generateValue: true
+      - key: INTERNAL_SIGNING_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: REDIS_PUBSUB_CHANNEL
+        value: presentation_events
+
+  - type: worker
+    name: slideflow-celery
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    dockerCommand: celery -A worker.celery_app worker --loglevel=info
+    plan: starter
+    envVars:
+      - key: REDIS_URL
+        sync: false
+      - key: NEXT_API_URL
+        sync: false
+      - key: INTERNAL_SERVICE_TOKEN
+        sync: false
+      - key: INTERNAL_SIGNING_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: REDIS_PUBSUB_CHANNEL
+        value: presentation_events
+
+  - type: web
+    name: slideflow-app
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: starter
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+      - key: FASTAPI_URL
+        sync: false
+      - key: INTERNAL_SERVICE_TOKEN
+        sync: false
+      - key: INTERNAL_SIGNING_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: UPLOADTHING_SECRET
+        sync: false
+      - key: UPLOADTHING_APP_ID
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false

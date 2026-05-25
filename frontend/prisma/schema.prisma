@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PresentationStatus {
+  PENDING
+  PROCESSING
+  PARSED
+  ERROR
+}
+
+model User {
+  id            String         @id
+  email         String         @unique
+  name          String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  presentations Presentation[]
+  sessions      Session[]
+}
+
+model Presentation {
+  id        String   @id @default(uuid())
+  title     String
+  ownerId   String
+  owner     User     @relation(fields: [ownerId], references: [id])
+  fileUrl   String?
+  status    PresentationStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  slides    Slide[]
+  sessions  Session[]
+}
+
+model Slide {
+  id             String       @id @default(uuid())
+  presentationId String
+  presentation   Presentation @relation(fields: [presentationId], references: [id], onDelete: Cascade)
+  order          Int
+  content        String?
+  imageUrl       String?
+  aiSummary      String?
+  keywords       String[]
+  speakerNotes   String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Session {
+  id             String       @id @default(uuid())
+  presentationId String
+  presentation   Presentation @relation(fields: [presentationId], references: [id], onDelete: Cascade)
+  presenterId    String
+  presenter      User         @relation(fields: [presenterId], references: [id])
+  startTime      DateTime     @default(now())
+  endTime        DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
