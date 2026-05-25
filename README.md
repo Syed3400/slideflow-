@@ -92,7 +92,8 @@ Core variables (see `.env.example`):
 
 ## Deploy globally
 
-See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for Vercel + Render, VPS Docker, and production env vars.
+- **Free (recommended):** **[DEPLOY_FREE.md](./DEPLOY_FREE.md)** — Vercel + Fly.io + Neon + Upstash ($0)
+- **Paid / Blueprint:** **[DEPLOYMENT.md](./DEPLOYMENT.md)** — includes Render (workers cost money)
 
 Quick VPS deploy:
 

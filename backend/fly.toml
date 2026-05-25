@@ -1,0 +1,36 @@
+# Fly.io — free-tier friendly (API + Celery worker in ONE app, two processes)
+# Deploy from backend folder: fly launch && fly secrets import ... && fly deploy
+# Docs: DEPLOY_FREE.md
+
+app = 'slideflow-api'
+primary_region = 'iad'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  PORT = '8080'
+  REDIS_PUBSUB_CHANNEL = 'presentation_events'
+  WS_HEARTBEAT_SECONDS = '30'
+
+[processes]
+  web = 'sh -c "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"'
+  worker = 'celery -A worker.celery_app worker --loglevel=info'
+
+[http_service]
+  processes = ['web']
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  processes = ['web']
+  size = 'shared-cpu-1x'
+  memory = '256mb'
+
+[[vm]]
+  processes = ['worker']
+  size = 'shared-cpu-1x'
+  memory = '512mb'

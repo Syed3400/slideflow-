@@ -1,6 +1,6 @@
-# Render Blueprint — https://render.com/docs/blueprint-spec
-# Deploy: connect repo → New Blueprint → select render.yaml
-# Create a Render Postgres + Redis manually and paste URLs into env groups below.
+# Render Blueprint — PAID (starter plan + workers are not free).
+# For free hosting use DEPLOY_FREE.md (Vercel + Fly.io + Neon + Upstash).
+# https://render.com/docs/blueprint-spec
 
 services:
   - type: web
